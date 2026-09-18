@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PHÚC AN SATELLITE SYSTEM</title>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body><canvas id="scene"></canvas>
+  <main class="hud">
+    <div class="count" id="count"><small>CRITICAL EVENT IN</small><b id="clock">10</b>
+      <p id="msg">STRUCTURAL FAILURE DETECTED</p>
+    </div>
+    <div class="bottom">
+      <section class="panel">
+        <div class="row"><span>HULL INTEGRITY</span><b id="integrity">100%</b></div>
+        <div class="bar"><i id="bar"></i></div>
+        <div class="row"><span>ORBITAL VELOCITY</span><b id="velocity">7.66 km/s</b></div>
+      </section>
+
+    </div>
+  </main>
+  <aside class="terminal">
+    <div class="term-head"><b>root@orbital-gateway</b>:~$ ./telemetry --live<br><span>PHÚC AN's SATELLITE</span>
+    </div>
+    <div class="term-meta"><span>MODE <strong>SATELLITE SYSTEM LIVE</strong></span><span>UPLINK <strong>7.2
+          kb/s</strong></span><span>ORBIT <strong>LEO / 408 km</strong></span><span>STATUS <strong
+          id="termStatus">TRACKING</strong></span></div>
+    <div class="logs" id="logs"></div>
+    <div class="terminal-count" id="termCount" aria-live="polite"></div>
+    <div class="prompt">root@orbital:~$ <span class="cursor"></span></div>
+  </aside>
+  <script src="script.js"></script>
+</body>
+
+</html>
