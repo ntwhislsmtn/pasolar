@@ -1,1 +1,360 @@
-aaa
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PHÚC AN SATELLITE SYSTEM</title>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #01040d;
+      color: #e9fbff;
+      font: 12px ui-monospace, Consolas, monospace
+    }
+
+    canvas {
+      right: 33.333vw;
+      width: 66.667vw !important;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%
+    }
+
+    .hud {
+      position: fixed;
+      inset: 0;
+      padding: 25px;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between
+    }
+
+    header,
+    .bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px
+    }
+
+    h1 {
+      margin: 0;
+      letter-spacing: .2em
+    }
+
+    .sub {
+      color: #82efff;
+      letter-spacing: .16em;
+      font-size: 10px
+    }
+
+    .status {
+      text-align: right;
+      color: #8aa9ba
+    }
+
+    .count {
+      position: absolute;
+      top: 46%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      text-shadow: 0 0 25px #000
+    }
+
+    .count small {
+      letter-spacing: .3em
+    }
+
+    .count b {
+      display: block;
+      font-size: clamp(80px, 15vw, 180px);
+      line-height: .9;
+      text-shadow: 0 0 35px #49d8ff
+    }
+
+    .count.boom b {
+      color: #fff1bf;
+      text-shadow: 0 0 20px #fff, 0 0 80px #ff643e
+    }
+
+    .panel,
+    .controls {
+      background: #04101dbb;
+      border: 1px solid #78dfff55;
+      padding: 12px
+    }
+
+    .panel {
+      border-left: 3px solid #82efff;
+      min-width: 240px
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 25px;
+      color: #8aa9ba
+    }
+
+    .bar {
+      height: 3px;
+      background: #163040;
+      margin: 10px 0
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #82efff, #ff674a);
+      width: 100%
+    }
+
+    button {
+      pointer-events: auto;
+      background: #0a1b2b;
+      color: #e9fbff;
+      border: 1px solid #3f6d82;
+      padding: 8px;
+      cursor: pointer
+    }
+
+    @media(max-width:600px) {
+      .hud {
+        padding: 15px
+      }
+
+      .bottom {
+        flex-direction: column
+      }
+
+      .panel {
+        min-width: 0
+      }
+    }
+
+    .hud header,
+    .hud>.bottom {
+      width: 66.666vw
+    }
+
+    .count {
+      left: 33.333vw
+    }
+
+    .terminal {
+      position: fixed;
+      z-index: 5;
+      right: 0;
+      top: 0;
+      width: 33.333vw;
+      height: 100vh;
+      padding: 20px;
+      background: linear-gradient(110deg, #03170ddd, #020b08f5);
+      border-left: 1px solid #25ed8c77;
+      box-shadow: -22px 0 55px #000b;
+      color: #5cff9b;
+      font: 11px/1.55 ui-monospace, Consolas, monospace;
+      overflow: hidden
+    }
+
+    .terminal:before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent 0 3px, #2aff7910 4px 5px);
+      pointer-events: none
+    }
+
+    .term-head {
+      position: relative;
+      border-bottom: 1px solid #35e98966;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+      color: #a1ffd0;
+      letter-spacing: .12em
+    }
+
+    .term-head b {
+      color: #fff
+    }
+
+    .term-meta {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      color: #39d77a;
+      border-bottom: 1px solid #28bb6455;
+      padding-bottom: 12px;
+      margin-bottom: 12px
+    }
+
+    .term-meta strong {
+      color: #b7ffcf;
+      font-weight: 400
+    }
+
+    .logs {
+      position: relative;
+      height: calc(100vh - 195px);
+      overflow: hidden;
+      text-shadow: 0 0 8px #1cff7088
+    }
+
+    .log {
+      white-space: nowrap;
+      animation: termIn .25s ease-out;
+      color: #55ee91
+    }
+
+    .log i {
+      font-style: normal;
+      color: #d0ffe2
+    }
+
+    .log.warn {
+      color: #ffd168
+    }
+
+    .log.err {
+      color: #ff806c
+    }
+
+    @keyframes termIn {
+      from {
+        transform: translateX(-12px);
+        opacity: 0
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1
+      }
+    }
+
+    .prompt {
+      position: absolute;
+      bottom: 18px;
+      left: 20px;
+      right: 20px;
+      border-top: 1px solid #35e98966;
+      padding-top: 10px;
+      color: #c8ffe0
+    }
+
+    .cursor {
+      display: inline-block;
+      background: #5cff9b;
+      width: 7px;
+      height: 13px;
+      vertical-align: -2px;
+      animation: blink .7s infinite
+    }
+
+    @media(max-width:760px) {
+      .terminal {
+        top: auto;
+        bottom: 0;
+        width: 100%;
+        height: 35vh;
+        border-left: 0;
+        border-top: 1px solid #25ed8c77;
+        padding: 14px
+      }
+
+      .hud header,
+      .hud>.bottom {
+        width: 100%
+      }
+
+      .count {
+        left: 50%;
+        top: 32%
+      }
+
+      .logs {
+        height: calc(35vh - 145px)
+      }
+
+      .term-meta {
+        display: none
+      }
+
+      .prompt {
+        bottom: 11px;
+        left: 14px
+      }
+
+      .terminal:before {
+        display: none
+      }
+    }
+
+    body,
+    button {
+      font-family: Cascadia Mono, Consolas, ui-monospace, monospace !important
+    }
+
+    .sub:after {
+      content: "  •  REV-03";
+      color: #ffe081
+    }
+
+    .count {
+      display: none !important
+    }
+
+    .terminal-count {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      font-size: clamp(110px, 15vw, 250px);
+      font-weight: 700;
+      line-height: 1;
+      color: #74ffac;
+      opacity: 0;
+      text-shadow: 0 0 12px #54ff94, 0 0 42px #13e86d, 0 0 85px #0bb855;
+      transition: opacity .18s
+    }
+
+    .terminal-count.visible {
+      opacity: .88
+    }
+
+    .terminal-count.pulse {
+      animation: terminalNumber .92s cubic-bezier(.2, .8, .2, 1)
+    }
+
+    @keyframes terminalNumber {
+      0% {
+        opacity: 0;
+        transform: scale(1.24);
+        filter: blur(10px)
+      }
+
+      35% {
+        opacity: 1;
+        transform: scale(.94);
+        filter: blur(0)
+      }
+
+      72% {
+        opacity: .42;
+        transform: scale(1.03)
+      }
+
+      100% {
+        opacity: .88;
+        transform: scale(1)
+      }
+    }
+  .completed-session .terminal{display:none}.completed-session canvas{right:0;width:100%!important}.completed-session .hud header,.completed-session .hud>.bottom{width:100%}.completed-session .count{display:none!important}</style>
+</head>
