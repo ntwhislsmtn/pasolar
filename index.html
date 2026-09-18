@@ -456,3 +456,7 @@ if (!sessionComplete) typeTerminal(); let W, H, last = 0, t = 0, run = true, rat
       x.strokeStyle = '#e4ffff'; x.lineWidth = 1.3; x.strokeRect(-59, -42, 118, 83); x.strokeRect(-55, -36, 62, 69);
       for (let y = -25; y < 34; y += 14) { x.beginPath(); x.moveTo(-55, y); x.lineTo(7, y); x.stroke() } for (let y = -35; y < 41; y += 15) { x.beginPath(); x.moveTo(36, y); x.lineTo(59, y); x.stroke() }
       // radiator grids
+for (let y = -25; y < 34; y += 14) { x.beginPath(); x.moveTo(-55, y); x.lineTo(7, y); x.stroke() } for (let y = -35; y < 41; y += 15) { x.beginPath(); x.moveTo(36, y); x.lineTo(59, y); x.stroke() }
+      // radiator grids
+      x.fillStyle = '#c6d1d1'; x.fillRect(-48, 52, 80, 18); x.strokeStyle = '#607d85'; for (let i = -42; i < 31; i += 8) { x.beginPath(); x.moveTo(i, 52); x.lineTo(i, 70); x.stroke() }
+      // raised avionics box / optical payload
