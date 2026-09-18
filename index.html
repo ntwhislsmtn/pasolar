@@ -358,3 +358,79 @@
     }
   .completed-session .terminal{display:none}.completed-session canvas{right:0;width:100%!important}.completed-session .hud header,.completed-session .hud>.bottom{width:100%}.completed-session .count{display:none!important}</style>
 </head>
+<body><canvas id="scene"></canvas>
+  <main class="hud">
+    <div class="count" id="count"><small>CRITICAL EVENT IN</small><b id="clock">10</b>
+      <p id="msg">STRUCTURAL FAILURE DETECTED</p>
+    </div>
+    <div class="bottom">
+      <section class="panel">
+        <div class="row"><span>HULL INTEGRITY</span><b id="integrity">100%</b></div>
+        <div class="bar"><i id="bar"></i></div>
+        <div class="row"><span>ORBITAL VELOCITY</span><b id="velocity">7.66 km/s</b></div>
+      </section>
+
+    </div>
+  </main>
+  <aside class="terminal">
+    <div class="term-head"><b>root@orbital-gateway</b>:~$ ./telemetry --live<br><span>PHÚC AN's SATELLITE</span>
+    </div>
+    <div class="term-meta"><span>MODE <strong>SATELLITE SYSTEM LIVE</strong></span><span>UPLINK <strong>7.2
+          kb/s</strong></span><span>ORBIT <strong>LEO / 408 km</strong></span><span>STATUS <strong
+          id="termStatus">TRACKING</strong></span></div>
+    <div class="logs" id="logs"></div>
+    <div class="terminal-count" id="termCount" aria-live="polite"></div>
+    <div class="prompt">root@orbital:~$ <span class="cursor"></span></div>
+  </aside>
+  <script>const c = document.querySelector('#scene'), x = c.getContext('2d'), $ = id => document.querySelector('#' + id); const logBox = $('logs');const sessionComplete = sessionStorage.getItem('sat06Completed') === '1'; if(sessionComplete)document.body.classList.add('completed-session');function completeSession(){
+ sessionStorage.setItem('sat06Completed','1');
+ document.body.classList.add('completed-session');
+ requestAnimationFrame(rs);
+}let terminalAudio;
+function enableTerminalAudio(){
+ if(!terminalAudio){const AC=window.AudioContext||window.webkitAudioContext;terminalAudio=new AC()}
+ if(terminalAudio.state==='suspended')terminalAudio.resume();
+}
+function terminalKeySound(){
+ if(!terminalAudio||terminalAudio.state!=='running')return;
+ const osc=terminalAudio.createOscillator(),gain=terminalAudio.createGain(),now=terminalAudio.currentTime;
+ osc.type='square';osc.frequency.value=720+(letterIndex%5)*55;
+ gain.gain.setValueAtTime(.018,now);gain.gain.exponentialRampToValueAtTime(.001,now+.028);
+ osc.connect(gain);gain.connect(terminalAudio.destination);osc.start(now);osc.stop(now+.03);
+}
+document.addEventListener('pointerdown',enableTerminalAudio,{once:true});
+document.addEventListener('keydown',enableTerminalAudio,{once:true});
+    const terminalMessages = [
+      'Xin chào Nguyễn Phúc An',
+      'Tôi là vệ tinh của bạn',
+      'Trong suốt thời gian qua, bạn đã rất cố gắng và hoàn thành tốt những kỷ luật mà mình đã đặt ra',
+      'Bạn đã có thể tự dậy sớm mỗi ngày',
+      'Bạn đã có thể tự tắm rửa, vệ sinh cá nhân sạch sẽ và tự giác học tập',
+      'Chúc mừng bạn, Nguyễn Phúc An',
+      'Những thành tích này cho thấy bạn đang ngày càng trưởng thành, chăm chỉ và có trách nhiệm hơn',
+      'Hãy tiếp tục cố gắng hơn nữa nhé',
+      'Mỗi ngày chỉ cần tiến bộ một chút, bạn sẽ làm được rất nhiều điều tuyệt vời',
+      'Tạm biệt Nguyễn Phúc An',
+      'Hẹn gặp lại bạn trong những thành công tiếp theo'
+    ];
+    let messageIndex = 0, letterIndex = 0, typingRow;
+    function scrollTerminal() { logBox.scrollTop = logBox.scrollHeight }
+    function appendSpace() { let space = document.createElement('div'); space.className = 'log'; space.innerHTML = '&nbsp;'; logBox.appendChild(space); scrollTerminal() }
+    function typeTerminal() {
+      const message = terminalMessages[messageIndex];
+      if (letterIndex === 0) { typingRow = document.createElement('div'); typingRow.className = 'log'; logBox.appendChild(typingRow) }
+      if (letterIndex < message.length) { typingRow.textContent = ': ' + message.slice(0, ++letterIndex); terminalKeySound(); scrollTerminal(); setTimeout(typeTerminal, 26) }
+      else { appendSpace(); messageIndex++; letterIndex = 0; if (messageIndex < terminalMessages.length) setTimeout(typeTerminal, 3000); else setTimeout(startCountdown, 3000) }
+    }
+    function startCountdown() {
+      let number = 10, display = $('termCount');
+      sequenceArmed = true; t = 0; boom = false;
+      const tick = () => {
+        display.textContent = number;
+        display.classList.remove('pulse'); void display.offsetWidth;
+        display.classList.add('visible', 'pulse');
+        if (number-- > 0) setTimeout(tick, 1000);
+        else setTimeout(() => display.classList.remove('visible'), 900);
+      };
+      tick();
+    }
